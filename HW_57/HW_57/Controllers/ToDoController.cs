@@ -25,6 +25,7 @@ public class TodoController : Controller
         string? descriptionWords,
         TaskPriority? priority,
         TaskState? state,
+        string? listType,
         TodoSortState sortOrder = TodoSortState.CreatedOnDescending,
         int page = 1)
     {
@@ -33,6 +34,21 @@ public class TodoController : Controller
         IQueryable<ToDoTask> tasks = _context.Tasks
             .Include(task => task.Creator)
             .Include(task => task.Executor);
+        
+        string? currentUserId = _userManager.GetUserId(User);
+
+        if (listType == "free")
+        {
+            tasks = tasks.Where(task => task.ExecutorId == null && task.State == TaskState.New);
+        }
+        else if (listType == "created" && currentUserId != null)
+        {
+            tasks = tasks.Where(task => task.CreatorId == currentUserId);
+        }
+        else if (listType == "taken" && currentUserId != null)
+        {
+            tasks = tasks.Where(task => task.ExecutorId == currentUserId);
+        }
 
         if (!string.IsNullOrWhiteSpace(title))
         {
@@ -126,6 +142,7 @@ public class TodoController : Controller
         ViewBag.States = new SelectList(Enum.GetValues<TaskState>(), state);
         
         ViewBag.CurrentUserId = _userManager.GetUserId(User);
+        ViewBag.ListType = listType;
         
         return View(viewModel);
     }

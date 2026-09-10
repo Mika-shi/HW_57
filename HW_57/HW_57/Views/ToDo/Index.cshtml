@@ -7,6 +7,7 @@
     bool isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
     bool isAdmin = User.IsInRole("admin");
     string? currentUserId = ViewBag.CurrentUserId as string;
+    string? listType = ViewBag.ListType as string;
 }
 
 <h1>To-Do List</h1>
@@ -19,6 +20,35 @@
 
     <br />
     <br />
+
+    <div class="mb-3">
+        <a asp-action="Index"
+           asp-controller="Todo"
+           class="btn @(string.IsNullOrWhiteSpace(listType) ? "btn-primary" : "btn-outline-primary")">
+            All tasks
+        </a>
+
+        <a asp-action="Index"
+           asp-controller="Todo"
+           asp-route-listType="free"
+           class="btn @(listType == "free" ? "btn-success" : "btn-outline-success")">
+            Free tasks
+        </a>
+
+        <a asp-action="Index"
+           asp-controller="Todo"
+           asp-route-listType="created"
+           class="btn @(listType == "created" ? "btn-warning" : "btn-outline-warning")">
+            My created tasks
+        </a>
+
+        <a asp-action="Index"
+           asp-controller="Todo"
+           asp-route-listType="taken"
+           class="btn @(listType == "taken" ? "btn-info" : "btn-outline-info")">
+            My taken tasks
+        </a>
+    </div>
 }
 
 @if (TempData["Message"] != null)
@@ -29,6 +59,8 @@
 }
 
 <form asp-action="Index" asp-controller="Todo" method="get" class="row g-3">
+    <input type="hidden" name="listType" value="@ViewBag.ListType" />
+
     <div class="col-md-4">
         <label>Title</label>
         <input type="text"
@@ -104,6 +136,7 @@ else
             <th>
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewBag.TitleSort"
+                   asp-route-listType="@ViewBag.ListType"
                    asp-route-title="@ViewBag.FilterTitle"
                    asp-route-createdFrom="@ViewBag.CreatedFrom"
                    asp-route-createdTo="@ViewBag.CreatedTo"
@@ -117,6 +150,7 @@ else
             <th>
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewBag.PrioritySort"
+                   asp-route-listType="@ViewBag.ListType"
                    asp-route-title="@ViewBag.FilterTitle"
                    asp-route-createdFrom="@ViewBag.CreatedFrom"
                    asp-route-createdTo="@ViewBag.CreatedTo"
@@ -130,6 +164,7 @@ else
             <th>
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewBag.StateSort"
+                   asp-route-listType="@ViewBag.ListType"
                    asp-route-title="@ViewBag.FilterTitle"
                    asp-route-createdFrom="@ViewBag.CreatedFrom"
                    asp-route-createdTo="@ViewBag.CreatedTo"
@@ -143,6 +178,7 @@ else
             <th>
                 <a asp-action="Index"
                    asp-route-sortOrder="@ViewBag.CreatedOnSort"
+                   asp-route-listType="@ViewBag.ListType"
                    asp-route-title="@ViewBag.FilterTitle"
                    asp-route-createdFrom="@ViewBag.CreatedFrom"
                    asp-route-createdTo="@ViewBag.CreatedTo"
@@ -171,11 +207,8 @@ else
 
             <tr>
                 <td>@task.Title</td>
-
                 <td>@task.Priority</td>
-
                 <td>@task.State</td>
-
                 <td>@task.CreatedOn.ToString("dd.MM.yyyy HH:mm")</td>
 
                 <td>
@@ -239,7 +272,7 @@ else
                                 </a>
                             }
 
-                            @if (task.State == TaskState.Open && isExecutor)
+                            @if (task.State != TaskState.Closed)
                             {
                                 <a asp-action="Close"
                                    asp-controller="Todo"
@@ -322,6 +355,7 @@ else
             <a asp-action="Index"
                asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
                asp-route-sortOrder="@ViewBag.SortOrder"
+               asp-route-listType="@ViewBag.ListType"
                asp-route-title="@ViewBag.FilterTitle"
                asp-route-createdFrom="@ViewBag.CreatedFrom"
                asp-route-createdTo="@ViewBag.CreatedTo"
@@ -342,6 +376,7 @@ else
             <a asp-action="Index"
                asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
                asp-route-sortOrder="@ViewBag.SortOrder"
+               asp-route-listType="@ViewBag.ListType"
                asp-route-title="@ViewBag.FilterTitle"
                asp-route-createdFrom="@ViewBag.CreatedFrom"
                asp-route-createdTo="@ViewBag.CreatedTo"
