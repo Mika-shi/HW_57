@@ -188,19 +188,32 @@ public class TodoController : Controller
             return NotFound();
         }
 
-        if (task.State == TaskState.Closed)
+        bool isAdmin = User.IsInRole("admin");
+
+        if (!isAdmin)
         {
-            TempData["Message"] = "Closed task cannot be taken.";
-            return RedirectToAction("Index");
+            if (task.State == TaskState.Closed)
+            {
+                TempData["Message"] = "Closed task cannot be taken.";
+                return RedirectToAction("Index");
+            }
+
+            if (task.ExecutorId != null)
+            {
+                TempData["Message"] = "This task has already been taken.";
+                return RedirectToAction("Index");
+            }
+
+            task.ExecutorId = userId;
+        }
+        else
+        {
+            if (task.ExecutorId == null)
+            {
+                task.ExecutorId = userId;
+            }
         }
 
-        if (task.ExecutorId != null)
-        {
-            TempData["Message"] = "This task has already been taken.";
-            return RedirectToAction("Index");
-        }
-
-        task.ExecutorId = userId;
         task.State = TaskState.Open;
         task.ClosedOn = null;
 
@@ -236,14 +249,14 @@ public class TodoController : Controller
         {
             return RedirectToAction("Login", "Account");
         }
-        
-        ToDoTask? task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+
+        ToDoTask? task = _context.Tasks.FirstOrDefault(task => task.Id == id);
 
         if (task == null)
         {
             return NotFound();
         }
-        
+
         bool isAdmin = User.IsInRole("admin");
         bool isExecutor = task.ExecutorId == userId;
 
@@ -253,17 +266,22 @@ public class TodoController : Controller
             return RedirectToAction("Index");
         }
 
-        if (task.State != TaskState.Closed)
+        if (task.State == TaskState.Closed)
         {
-            TempData["Message"] = "Only open task can be closed.";
+            TempData["Message"] = "Task is already closed.";
             return RedirectToAction("Index");
+        }
+
+        if (isAdmin && task.ExecutorId == null)
+        {
+            task.ExecutorId = userId;
         }
 
         task.State = TaskState.Closed;
         task.ClosedOn = DateTime.UtcNow;
 
         _context.SaveChanges();
-        
+
         return RedirectToAction("Index");
     }
     

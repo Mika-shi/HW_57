@@ -3,11 +3,15 @@
 
 @{
     ViewData["Title"] = "To-Do List";
+
+    bool isAuthenticated = User.Identity != null && User.Identity.IsAuthenticated;
+    bool isAdmin = User.IsInRole("admin");
+    string? currentUserId = ViewBag.CurrentUserId as string;
 }
 
 <h1>To-Do List</h1>
 
-@if (User.Identity != null && User.Identity.IsAuthenticated)
+@if (isAuthenticated)
 {
     <a asp-action="Create" asp-controller="Todo" class="btn btn-primary">
         Create new task
@@ -27,22 +31,36 @@
 <form asp-action="Index" asp-controller="Todo" method="get" class="row g-3">
     <div class="col-md-4">
         <label>Title</label>
-        <input type="text" name="title" value="@ViewBag.FilterTitle" placeholder="Enter the title of the task" class="form-control" />
+        <input type="text"
+               name="title"
+               value="@ViewBag.FilterTitle"
+               placeholder="Enter the title of the task"
+               class="form-control" />
     </div>
 
     <div class="col-md-4">
         <label>Created from</label>
-        <input type="date" name="createdFrom" value="@ViewBag.CreatedFrom" class="form-control" />
+        <input type="date"
+               name="createdFrom"
+               value="@ViewBag.CreatedFrom"
+               class="form-control" />
     </div>
 
     <div class="col-md-4">
         <label>Created to</label>
-        <input type="date" name="createdTo" value="@ViewBag.CreatedTo" class="form-control" />
+        <input type="date"
+               name="createdTo"
+               value="@ViewBag.CreatedTo"
+               class="form-control" />
     </div>
 
     <div class="col-md-4">
         <label>Description</label>
-        <input type="text" name="descriptionWords" value="@ViewBag.DescriptionWords" placeholder="Enter words from description" class="form-control" />
+        <input type="text"
+               name="descriptionWords"
+               value="@ViewBag.DescriptionWords"
+               placeholder="Enter words from description"
+               class="form-control" />
     </div>
 
     <div class="col-md-4">
@@ -60,7 +78,9 @@
     </div>
 
     <div class="col-md-12">
-        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" class="btn btn-primary">
+            Filter
+        </button>
 
         <a asp-action="Index" asp-controller="Todo" class="btn btn-secondary">
             Reset
@@ -136,7 +156,7 @@ else
             <th>Creator</th>
             <th>Executor</th>
 
-            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            @if (isAuthenticated)
             {
                 <th>Actions</th>
             }
@@ -146,10 +166,16 @@ else
         <tbody>
         @foreach (var task in Model.Tasks)
         {
+            bool isCreator = currentUserId != null && task.CreatorId == currentUserId;
+            bool isExecutor = currentUserId != null && task.ExecutorId == currentUserId;
+
             <tr>
                 <td>@task.Title</td>
+
                 <td>@task.Priority</td>
+
                 <td>@task.State</td>
+
                 <td>@task.CreatedOn.ToString("dd.MM.yyyy HH:mm")</td>
 
                 <td>
@@ -174,48 +200,109 @@ else
                     }
                 </td>
 
-                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                @if (isAuthenticated)
                 {
                     <td>
-                        <a asp-action="Details" asp-controller="Todo" asp-route-id="@task.Id" class="btn btn-outline-primary btn-sm">
+                        <a asp-action="Details"
+                           asp-controller="Todo"
+                           asp-route-id="@task.Id"
+                           class="btn btn-outline-primary btn-sm">
                             Details
                         </a>
 
-                        @if (task.State == TaskState.New)
+                        @if (isAdmin)
                         {
-                            <a asp-action="Open" asp-controller="Todo" asp-route-id="@task.Id" class="btn btn-success btn-sm">
-                                Take task
+                            <a asp-action="Edit"
+                               asp-controller="Todo"
+                               asp-route-id="@task.Id"
+                               class="btn btn-warning btn-sm">
+                                Edit
                             </a>
 
-                            <a asp-action="Delete" asp-controller="Todo" asp-route-id="@task.Id"
+                            @if (task.State == TaskState.New)
+                            {
+                                <a asp-action="Open"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-success btn-sm">
+                                    Take task
+                                </a>
+                            }
+
+                            @if (task.State == TaskState.Closed)
+                            {
+                                <a asp-action="Open"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-success btn-sm">
+                                    Reopen
+                                </a>
+                            }
+
+                            @if (task.State != TaskState.Closed)
+                            {
+                                <a asp-action="Close"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-warning btn-sm">
+                                    Close
+                                </a>
+                            }
+
+                            <a asp-action="Delete"
+                               asp-controller="Todo"
+                               asp-route-id="@task.Id"
                                onclick="return confirm('Are you sure you want to delete this task?');"
                                class="btn btn-danger btn-sm">
                                 Delete
                             </a>
                         }
-
-                        @if (task.State == TaskState.Open)
+                        else
                         {
-                            <a asp-action="Close" asp-controller="Todo" asp-route-id="@task.Id" class="btn btn-warning btn-sm">
-                                Close
-                            </a>
+                            @if (isCreator)
+                            {
+                                <a asp-action="Edit"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-warning btn-sm">
+                                    Edit
+                                </a>
 
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                Delete disabled
-                            </button>
-                        }
+                                <a asp-action="Delete"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   onclick="return confirm('Are you sure you want to delete this task?');"
+                                   class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
+                            }
 
-                        @if (task.State == TaskState.Closed)
-                        {
-                            <button class="btn btn-secondary btn-sm" disabled>
-                                Open disabled
-                            </button>
+                            @if (task.State == TaskState.New && task.ExecutorId == null)
+                            {
+                                <a asp-action="Open"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-success btn-sm">
+                                    Take task
+                                </a>
+                            }
 
-                            <a asp-action="Delete" asp-controller="Todo" asp-route-id="@task.Id"
-                               onclick="return confirm('Are you sure you want to delete this task?');"
-                               class="btn btn-danger btn-sm">
-                                Delete
-                            </a>
+                            @if (task.State == TaskState.Open && isExecutor)
+                            {
+                                <a asp-action="Close"
+                                   asp-controller="Todo"
+                                   asp-route-id="@task.Id"
+                                   class="btn btn-warning btn-sm">
+                                    Close
+                                </a>
+                            }
+
+                            @if (task.State == TaskState.Closed)
+                            {
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Closed
+                                </button>
+                            }
                         }
                     </td>
                 }
@@ -229,8 +316,6 @@ else
 
 @if (Model.Tasks.Count > 0)
 {
-    <br />
-
     <div>
         @if (Model.PageViewModel.HasPreviousPage)
         {
