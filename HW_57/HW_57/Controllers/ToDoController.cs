@@ -125,6 +125,8 @@ public class TodoController : Controller
         ViewBag.Priorities = new SelectList(Enum.GetValues<TaskPriority>(), priority);
         ViewBag.States = new SelectList(Enum.GetValues<TaskState>(), state);
         
+        ViewBag.CurrentUserId = _userManager.GetUserId(User);
+        
         return View(viewModel);
     }
 

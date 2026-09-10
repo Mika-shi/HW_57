@@ -239,7 +239,7 @@ else
                                 </a>
                             }
 
-                            @if (task.State != TaskState.Closed)
+                            @if (task.State == TaskState.Open && isExecutor)
                             {
                                 <a asp-action="Close"
                                    asp-controller="Todo"
