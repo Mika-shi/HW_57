@@ -373,3 +373,4 @@ C:\Users\User\Documents\HW_57_Aiperi\HW_57\HW_57\obj\Debug\net10.0\HW_57.csproj.
 C:\Users\User\Documents\HW_57_Aiperi\HW_57\HW_57\obj\Debug\net10.0\HW_57.genruntimeconfig.cache
 C:\Users\User\Documents\HW_57_Aiperi\HW_57\HW_57\obj\Debug\net10.0\ref\HW_57.dll
 C:\Users\User\Documents\HW_57_Aiperi\HW_57\HW_57\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\Users\User\Documents\HW_57_Aiperi\HW_57\HW_57\obj\Debug\net10.0\HW_57.sourcelink.json

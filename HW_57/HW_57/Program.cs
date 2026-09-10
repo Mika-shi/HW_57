@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using HW_57.Models;
 using Microsoft.AspNetCore.Identity;
+using HW_57.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,5 +47,17 @@ app.MapControllerRoute(
         pattern: "{controller=Todo}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider services = scope.ServiceProvider;
+
+    RoleManager<IdentityRole> roleManager =
+        services.GetRequiredService<RoleManager<IdentityRole>>();
+
+    UserManager<User> userManager =
+        services.GetRequiredService<UserManager<User>>();
+
+    await AdminInitializer.SeedAdminUser(roleManager, userManager);
+}
 
 app.Run();

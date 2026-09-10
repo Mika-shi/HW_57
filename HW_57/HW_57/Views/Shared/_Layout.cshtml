@@ -22,15 +22,52 @@
             </button>
 
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Todo" asp-action="Index">List of tasks</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Todo" asp-action="Create">Create task</a>
-                    </li>
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Todo" asp-action="Create">Create task</a>
+                        </li>
+                    }
                 </ul>
+
+                <ul class="navbar-nav ms-auto">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link text-light">
+                                Hello, @User.Identity.Name
+                            </span>
+                        </li>
+
+                        <li class="nav-item">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="nav-link btn btn-link text-light">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-controller="Account" asp-action="Login">
+                                Login
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-controller="Account" asp-action="Register">
+                                Register
+                            </a>
+                        </li>
+                    }
+                </ul>
+
             </div>
         </div>
     </nav>

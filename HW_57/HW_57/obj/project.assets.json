@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net10.0": {
       "Azure.Core/1.50.0": {
@@ -6629,7 +6629,6 @@
       },
       "frameworks": {
         "net10.0": {
-          "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {}
         }
@@ -6648,7 +6647,6 @@
     },
     "frameworks": {
       "net10.0": {
-        "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
@@ -7130,7 +7128,7 @@
       "code": "NU1901",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "У пакета \"NuGet.Packaging\" 6.12.1 есть известная уязвимость https://github.com/advisories/GHSA-g4vj-cjjj-v7hg (уровень серьезности: низкий уровень)",
+      "message": "Package 'NuGet.Packaging' 6.12.1 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
       "libraryId": "NuGet.Packaging",
       "targetGraphs": [
         "net10.0"
@@ -7140,7 +7138,7 @@
       "code": "NU1901",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "У пакета \"NuGet.Protocol\" 6.12.1 есть известная уязвимость https://github.com/advisories/GHSA-g4vj-cjjj-v7hg (уровень серьезности: низкий уровень)",
+      "message": "Package 'NuGet.Protocol' 6.12.1 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
       "libraryId": "NuGet.Protocol",
       "targetGraphs": [
         "net10.0"

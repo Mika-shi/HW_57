@@ -3,16 +3,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using HW_57.Models;
 using HW_57.Models.Enums;
 using HW_57.ViewModels;
-using System;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace HW_57.Controllers;
 
 public class TodoController : Controller
 {
     private readonly ToDoContext _context;
-    public TodoController(ToDoContext context)
+    private readonly UserManager<User> _userManager;
+    public TodoController(ToDoContext context, UserManager<User> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     public IActionResult Index(string? title,
@@ -26,7 +30,9 @@ public class TodoController : Controller
     {
         int pageSize = 10;
 
-        var tasks = _context.Tasks.AsQueryable();
+        IQueryable<ToDoTask> tasks = _context.Tasks
+            .Include(task => task.Creator)
+            .Include(task => task.Executor);
 
         if (!string.IsNullOrWhiteSpace(title))
         {
@@ -122,6 +128,8 @@ public class TodoController : Controller
         return View(viewModel);
     }
 
+    [HttpGet]
+    [Authorize]
     public IActionResult Create()
     {
         ViewBag.Priorities = new SelectList(Enum.GetValues<TaskPriority>());
@@ -130,22 +138,32 @@ public class TodoController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-
+    [Authorize]
     public IActionResult Create(ToDoTask task)
     {
+        
+        string? userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        task.CreatorId = userId;
+        task.ExecutorId = null;
+        task.ResponsableName = null;
+        task.State = TaskState.New;
+        task.CreatedOn = DateTime.UtcNow;
+        task.ClosedOn = null;
+        
         task.Title = task.Title?.Trim() ?? "";
         task.Description = task.Description?.Trim() ?? "";
-        task.ResponsableName = task.ResponsableName?.Trim() ?? "";
 
         if (!ModelState.IsValid)
         {
             ViewBag.Priorities = new SelectList(Enum.GetValues<TaskPriority>(), task.Priority);
             return View(task);
         }
-
-        task.State = TaskState.New;
-        task.CreatedOn = DateTime.UtcNow;
-        task.ClosedOn = null;
 
         _context.Tasks.Add(task);
         _context.SaveChanges();

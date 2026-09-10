@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "hBD+04+CO1w=",
+  "dgSpecHash": "plTOQG7rbjI=",
   "success": true,
   "projectFilePath": "C:\\Users\\User\\Documents\\HW_57_Aiperi\\HW_57\\HW_57\\HW_57.csproj",
   "expectedPackageFiles": [
@@ -144,7 +144,7 @@
     {
       "code": "NU1901",
       "level": "Warning",
-      "message": "У пакета \"NuGet.Packaging\" 6.12.1 есть известная уязвимость https://github.com/advisories/GHSA-g4vj-cjjj-v7hg (уровень серьезности: низкий уровень)",
+      "message": "Package 'NuGet.Packaging' 6.12.1 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
       "projectPath": "C:\\Users\\User\\Documents\\HW_57_Aiperi\\HW_57\\HW_57\\HW_57.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\User\\Documents\\HW_57_Aiperi\\HW_57\\HW_57\\HW_57.csproj",
@@ -156,7 +156,7 @@
     {
       "code": "NU1901",
       "level": "Warning",
-      "message": "У пакета \"NuGet.Protocol\" 6.12.1 есть известная уязвимость https://github.com/advisories/GHSA-g4vj-cjjj-v7hg (уровень серьезности: низкий уровень)",
+      "message": "Package 'NuGet.Protocol' 6.12.1 has a known low severity vulnerability, https://github.com/advisories/GHSA-g4vj-cjjj-v7hg",
       "projectPath": "C:\\Users\\User\\Documents\\HW_57_Aiperi\\HW_57\\HW_57\\HW_57.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Users\\User\\Documents\\HW_57_Aiperi\\HW_57\\HW_57\\HW_57.csproj",
