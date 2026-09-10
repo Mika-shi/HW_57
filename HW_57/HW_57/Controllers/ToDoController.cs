@@ -220,10 +220,14 @@ public class TodoController : Controller
         {
             return NotFound();
         }
+        
+        ViewBag.CurrentUserId = _userManager.GetUserId(User);
+        ViewBag.IsAdmin = User.IsInRole("admin");
 
         return View(task);
     }
-
+    
+    [Authorize]
     public IActionResult Close(int id)
     {
         string? userId = _userManager.GetUserId(User);
@@ -261,6 +265,80 @@ public class TodoController : Controller
         _context.SaveChanges();
         
         return RedirectToAction("Index");
+    }
+    
+    [HttpGet]
+    [Authorize]
+    public IActionResult Edit(int id)
+    {
+        ToDoTask? task = _context.Tasks.FirstOrDefault(task => task.Id == id);
+
+        if (task == null)
+        {
+            return NotFound();
+        }
+
+        string? currentUserId = _userManager.GetUserId(User);
+
+        bool isAdmin = User.IsInRole("admin");
+        bool isCreator = currentUserId != null && task.CreatorId == currentUserId;
+
+        if (!isAdmin && !isCreator)
+        {
+            TempData["Message"] = "Only creator or admin can edit this task.";
+            return RedirectToAction("Index");
+        }
+
+        ViewBag.Priorities = new SelectList(Enum.GetValues<TaskPriority>(), task.Priority);
+
+        return View(task);
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize]
+    public IActionResult Edit(int id, ToDoTask task)
+    {
+        ToDoTask? existingTask = _context.Tasks.FirstOrDefault(existingTask => existingTask.Id == id);
+
+        if (existingTask == null)
+        {
+            return NotFound();
+        }
+
+        string? currentUserId = _userManager.GetUserId(User);
+
+        bool isAdmin = User.IsInRole("admin");
+        bool isCreator = currentUserId != null && existingTask.CreatorId == currentUserId;
+
+        if (!isAdmin && !isCreator)
+        {
+            TempData["Message"] = "Only creator or admin can edit this task.";
+            return RedirectToAction("Index");
+        }
+
+        task.Title = task.Title?.Trim() ?? "";
+        task.Description = task.Description?.Trim() ?? "";
+
+        ModelState.Remove("CreatorId");
+        ModelState.Remove("Creator");
+        ModelState.Remove("ExecutorId");
+        ModelState.Remove("Executor");
+        ModelState.Remove("ResponsableName");
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Priorities = new SelectList(Enum.GetValues<TaskPriority>(), task.Priority);
+            return View(task);
+        }
+
+        existingTask.Title = task.Title;
+        existingTask.Description = task.Description;
+        existingTask.Priority = task.Priority;
+
+        _context.SaveChanges();
+
+        return RedirectToAction("Details", new { id = existingTask.Id });
     }
 
     public IActionResult Delete(int id)
