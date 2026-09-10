@@ -171,9 +171,17 @@ public class TodoController : Controller
         return RedirectToAction("Index");
     }
 
+    [Authorize]
     public IActionResult Open(int id)
     {
-        ToDoTask? task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+        string? userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        ToDoTask? task = _context.Tasks.FirstOrDefault(task => task.Id == id);
 
         if (task == null)
         {
@@ -182,11 +190,20 @@ public class TodoController : Controller
 
         if (task.State == TaskState.Closed)
         {
-            TempData["Message"] = "Closed task cannot be opened.";
+            TempData["Message"] = "Closed task cannot be taken.";
             return RedirectToAction("Index");
         }
 
+        if (task.ExecutorId != null)
+        {
+            TempData["Message"] = "This task has already been taken.";
+            return RedirectToAction("Index");
+        }
+
+        task.ExecutorId = userId;
         task.State = TaskState.Open;
+        task.ClosedOn = null;
+
         _context.SaveChanges();
 
         return RedirectToAction("Index");

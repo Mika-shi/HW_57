@@ -184,7 +184,7 @@ else
                         @if (task.State == TaskState.New)
                         {
                             <a asp-action="Open" asp-controller="Todo" asp-route-id="@task.Id" class="btn btn-success btn-sm">
-                                Open
+                                Take task
                             </a>
 
                             <a asp-action="Delete" asp-controller="Todo" asp-route-id="@task.Id"
