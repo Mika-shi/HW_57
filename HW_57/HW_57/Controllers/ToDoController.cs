@@ -211,7 +211,10 @@ public class TodoController : Controller
     
     public IActionResult Details(int id)
     {
-        ToDoTask? task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+        ToDoTask? task = _context.Tasks
+            .Include(task => task.Creator)
+            .Include(task => task.Executor)
+            .FirstOrDefault(task => task.Id == id);
 
         if (task == null)
         {
@@ -223,20 +226,40 @@ public class TodoController : Controller
 
     public IActionResult Close(int id)
     {
+        string? userId = _userManager.GetUserId(User);
+
+        if (userId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        
         ToDoTask? task = _context.Tasks.FirstOrDefault(t => t.Id == id);
 
         if (task == null)
         {
             return NotFound();
         }
+        
+        bool isAdmin = User.IsInRole("admin");
+        bool isExecutor = task.ExecutorId == userId;
+
+        if (!isAdmin && !isExecutor)
+        {
+            TempData["Message"] = "Only executor can close this task.";
+            return RedirectToAction("Index");
+        }
 
         if (task.State != TaskState.Closed)
         {
-            task.State = TaskState.Closed;
-            task.ClosedOn = DateTime.UtcNow;
-            _context.SaveChanges();
+            TempData["Message"] = "Only open task can be closed.";
+            return RedirectToAction("Index");
         }
 
+        task.State = TaskState.Closed;
+        task.ClosedOn = DateTime.UtcNow;
+
+        _context.SaveChanges();
+        
         return RedirectToAction("Index");
     }
 

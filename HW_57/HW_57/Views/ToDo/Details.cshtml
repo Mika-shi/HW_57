@@ -1,49 +1,64 @@
 @model HW_57.Models.ToDoTask
 
 @{
-    ViewData["Title"] = "Create Task";
+    ViewData["Title"] = "Task details";
 }
 
-<h1>Create Task</h1>
+<h1>Task details</h1>
 
-<form asp-action="Create" asp-controller="Todo" method="post">
-    <div class="form-group">
-        <label asp-for="Title">Task title</label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+<div class="card mb-3" style="max-width: 800px;">
+    <div class="card-body">
+        <h3>@Model.Title</h3>
+
+        <p>
+            <strong>Description:</strong> @Model.Description
+        </p>
+
+        <p>
+            <strong>Priority:</strong> @Model.Priority
+        </p>
+
+        <p>
+            <strong>Status:</strong> @Model.State
+        </p>
+
+        <p>
+            <strong>Created on:</strong> @Model.CreatedOn.ToString("dd.MM.yyyy HH:mm")
+        </p>
+
+        @if (Model.ClosedOn != null)
+        {
+            <p>
+                <strong>Closed on:</strong> @Model.ClosedOn.Value.ToString("dd.MM.yyyy HH:mm")
+            </p>
+        }
+
+        <p>
+            <strong>Creator:</strong>
+            @if (Model.Creator != null)
+            {
+                @(Model.Creator.UserName ?? Model.Creator.Email)
+            }
+            else
+            {
+                <span>Unknown</span>
+            }
+        </p>
+
+        <p>
+            <strong>Executor:</strong>
+            @if (Model.Executor != null)
+            {
+                @(Model.Executor.UserName ?? Model.Executor.Email)
+            }
+            else
+            {
+                <span>Free</span>
+            }
+        </p>
+
+        <a asp-action="Index" asp-controller="Todo" class="btn btn-secondary">
+            Back to tasks
+        </a>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Priority">Priority</label>
-        <select asp-for="Priority" asp-items="ViewBag.Priorities" class="form-control">
-            <option value="">Choose priority</option>
-        </select>
-        <span asp-validation-for="Priority" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description">Detailed description</label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ResponsableName">Responsable name</label>
-        <input asp-for="ResponsableName" class="form-control" />
-        <span asp-validation-for="ResponsableName" class="text-danger"></span>
-    </div>
-
-    <br />
-
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
-
-<br />
-
-<a asp-action="Index" asp-controller="Todo">Back to tasks</a>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+</div>
